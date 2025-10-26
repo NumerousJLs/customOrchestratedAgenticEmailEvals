@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Analysis System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 24px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 24px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .conversation {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px 8px 0 0;
+            margin: -24px -24px 16px -24px;
+        }
+
+        .conversation h2 {
+            color: white;
+            margin: 0;
+        }
+
+        .messages {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message {
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-header {
+            padding: 12px 16px;
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message-header.system {
+            border-left-color: #9b59b6;
+        }
+
+        /* Layer 1: Context Extraction - Blue tones */
+        .message-header.context-analyzer,
+        .message-header[class*="context analyzer"] {
+            border-left-color: #3498db;
+        }
+
+        .message-header.relationship-mapper,
+        .message-header[class*="relationship mapper"] {
+            border-left-color: #5dade2;
+        }
+
+        .message-header.culture-detector,
+        .message-header[class*="culture detector"] {
+            border-left-color: #85c1e9;
+        }
+
+        /* Layer 2: Simulation - Orange/Yellow tones */
+        .message-header.recipient-persona,
+        .message-header[class*="recipient persona"] {
+            border-left-color: #e67e22;
+        }
+
+        .message-header.sender-advocate,
+        .message-header[class*="sender advocate"] {
+            border-left-color: #f39c12;
+        }
+
+        .message-header.devil-s-advocate,
+        .message-header[class*="devil"],
+        .message-header[class*="advocate"] {
+            border-left-color: #d68910;
+        }
+
+        .message-header.mediator {
+            border-left-color: #f8b739;
+        }
+
+        /* Layer 3: Evaluation - Red tones */
+        .message-header.tone-validator,
+        .message-header[class*="tone validator"] {
+            border-left-color: #e74c3c;
+        }
+
+        .message-header.goal-alignment,
+        .message-header[class*="goal alignment"] {
+            border-left-color: #ec7063;
+        }
+
+        .message-header.risk-assessment,
+        .message-header[class*="risk assessment"] {
+            border-left-color: #cb4335;
+        }
+
+        /* Layer 4: Output - Green tones */
+        .message-header.feedback-synthesizer,
+        .message-header[class*="feedback synthesizer"] {
+            border-left-color: #2ecc71;
+        }
+
+        .message-header.email-rewriter,
+        .message-header[class*="email rewriter"] {
+            border-left-color: #27ae60;
+        }
+
+        /* Legacy support */
+        .message-header.analyzer {
+            border-left-color: #3498db;
+        }
+
+        .message-header.evaluator {
+            border-left-color: #e74c3c;
+        }
+
+        .message-header.output {
+            border-left-color: #2ecc71;
+        }
+
+        .agent-icon {
+            font-size: 18px;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .message-type {
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #bdc3c7;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            color: #2c3e50;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .no-messages {
+            text-align: center;
+            color: #95a5a6;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .analyzing {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📧 12-Agent Email Analysis System</h1>
+            <p>4-Layer AI-Powered Multi-Agent Email Analyzer</p>
+        </header>
+
+        <div class="content">
+            <div class="panel">
+                <h2>Analyze Email</h2>
+                <form id="emailForm">
+                    <div class="form-group">
+                        <label for="sender">Sender Info:</label>
+                        <input type="text" id="sender" placeholder="e.g., Manager, Senior Developer">
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient">Recipient Info:</label>
+                        <input type="text" id="recipient" placeholder="e.g., Team, Junior Developer">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Content:</label>
+                        <textarea id="email" placeholder="Enter the email you want to analyze..." required></textarea>
+                    </div>
+                    <button type="submit" id="submitBtn">Analyze Email</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <div class="conversation">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>Agent Conversation</h2>
+                        <div id="analyzingIndicator" style="display: none;" class="analyzing">
+                            <span class="pulse"></span>
+                            Analyzing...
+                        </div>
+                    </div>
+                </div>
+                <div class="messages" id="messages">
+                    <div class="no-messages">
+                        No messages yet. Submit an email to start the analysis.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('emailForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messagesDiv = document.getElementById('messages');
+        const analyzingIndicator = document.getElementById('analyzingIndicator');
+        let pollInterval = null;
+
+        const agentIcons = {
+            'System': '🔷',
+            // Layer 1: Context Extraction
+            'Context Analyzer': '🔍',
+            'Relationship Mapper': '🔗',
+            'Culture Detector': '🌍',
+            // Layer 2: Simulation
+            'Recipient Persona': '👤',
+            'Sender Advocate': '🎯',
+            'Devil\'s Advocate': '😈',
+            'Mediator': '🤝',
+            // Layer 3: Evaluation
+            'Tone Validator': '🎭',
+            'Goal Alignment': '🎯',
+            'Risk Assessment': '⚠️',
+            // Layer 4: Output
+            'Feedback Synthesizer': '💡',
+            'Email Rewriter': '✍️',
+            // Legacy
+            'Analyzer': '🔍',
+            'Evaluator': '⚖️',
+            'Output': '📤'
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const emailText = document.getElementById('email').value;
+            const senderInfo = document.getElementById('sender').value || 'Unknown';
+            const recipientInfo = document.getElementById('recipient').value || 'Unknown';
+
+            if (!emailText.trim()) {
+                alert('Please enter an email to analyze');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Analyzing...';
+            messagesDiv.innerHTML = '';
+            analyzingIndicator.style.display = 'flex';
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email_text: emailText,
+                        sender_info: senderInfo,
+                        recipient_info: recipientInfo
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'submitted') {
+                    startPolling();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to submit email');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Analyze Email';
+                analyzingIndicator.style.display = 'none';
+            }
+        });
+
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+
+            pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/messages');
+                    const data = await response.json();
+
+                    displayMessages(data.messages);
+
+                    if (!data.analysis_in_progress) {
+                        stopPolling();
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 1000);
+        }
+
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Analyze Email';
+            analyzingIndicator.style.display = 'none';
+        }
+
+        function displayMessages(messages) {
+            if (messages.length === 0) {
+                messagesDiv.innerHTML = '<div class="no-messages">No messages yet.</div>';
+                return;
+            }
+
+            messagesDiv.innerHTML = messages.map(msg => {
+                const agentClass = msg.agent.toLowerCase().replace(/'/g, '-').replace(/\s+/g, '-');
+                return `
+                <div class="message">
+                    <div class="message-header ${agentClass}">
+                        <span class="agent-icon">${agentIcons[msg.agent] || '🤖'}</span>
+                        <span class="agent-name">${msg.agent}</span>
+                        <span class="message-type">${msg.type}</span>
+                    </div>
+                    <div class="message-content">${msg.content}</div>
+                </div>
+            `;
+            }).join('');
+
+            // Auto-scroll to bottom
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>
