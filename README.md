@@ -12,6 +12,16 @@ This project uses AI agents to simulate email recipients with different personal
 - **Customize personalities** with moods, contexts, and traits
 - **Deploy to Fetch.ai's agent network** for decentralized operation
 
+## Agents
+Relationship Mapper Agent
+@ agent1qfkjef3wa8cv6l0ceq8edakv5vw7fwmehlswkjayztv9ue6za525vzl6lfe
+
+Culture Detector Agent
+@culture-detector-agent
+
+Context Analyzer Agent
+@context-analyzer-agent
+
 ## Architecture
 
 ```
